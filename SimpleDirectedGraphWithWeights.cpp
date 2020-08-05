@@ -126,7 +126,7 @@ VertexArray* SimpleDirectedGraphWithWeights::getPathBFS()
     VertexArray* toReturn = nullptr;
     if (out != nullptr)
     {
-        toReturn = out->GetPath(m_VertexS, m_VertexT);
+        toReturn = out->GetRangeFromPath(m_VertexS, m_VertexT);
         delete out;
     }
 
@@ -186,7 +186,7 @@ VertexArray* SimpleDirectedGraphWithWeights::getPathDijkstra()
     VertexArray* toReturn = nullptr;
     if (out != nullptr)
     {
-        toReturn = out->GetPath(m_VertexS, m_VertexT);
+        toReturn = out->GetRangeFromPath(m_VertexS, m_VertexT);
         delete out;
     }
 
@@ -212,7 +212,7 @@ VertexArray* SimpleDirectedGraphWithWeights::dijkstra()
     {
         u = m_MaxHeap->DeleteMax().first;
         uAdjList = GetResidualGraphEdgeAdjList(u);
-        while (!uAdjList->IsEmpty())
+        while (uAdjList != nullptr && !uAdjList->IsEmpty())
         {
             v = uAdjList->DeQueue();
             relax(u, v);
@@ -263,7 +263,7 @@ SimpleDirectedGraphWithWeights::SimpleDirectedGraphWithWeights(const char* i_Fil
     if (myFile.is_open())
     {
         myFile >> m_NumberOfVeretex;
-        if (m_NumberOfVeretex < 0)
+        if (m_NumberOfVeretex <= 1)
         {
             throw new exception("Invalid input: number of vertex below 0.");
         }
@@ -423,7 +423,15 @@ Queue* SimpleDirectedGraphWithWeights::GetResidualGraphEdgeAdjList(Vertex i_U)
         }
     }
 
-    return adjacentQueue;
+    if (adjacentQueue->Length() == 0)
+    {
+        delete adjacentQueue;
+        return nullptr;
+    }
+    else
+    {
+        return adjacentQueue;
+    }
 }
 
 void SimpleDirectedGraphWithWeights::AddEdge(Vertex i_U, Vertex i_V, int i_Capacity)

@@ -60,7 +60,7 @@ void VertexArray::PushBack(Vertex i_ToAdd)
     m_Size++;
 }
 
-VertexArray* VertexArray::GetPath(Vertex i_Start, Vertex i_End)
+VertexArray* VertexArray::GetRangeFromPath(Vertex i_Start, Vertex i_End)
 {
     if (!inRange(i_Start) || !inRange(i_End) || i_Start > i_End)
     {
@@ -69,11 +69,9 @@ VertexArray* VertexArray::GetPath(Vertex i_Start, Vertex i_End)
         throw new exception(str);
     }
 
-    // need fix what if there is no path
-    // from End to start( check infinite)
     VertexArray* toReturn = new VertexArray();
-    if (m_Arr[i_End] != i_Start)
-    {
+    //if (m_Arr[i_End] != i_Start)
+    //{
         Vertex i = i_End;
         toReturn->PushBack(i_End);
         while (inRange(i) && i != i_Start)
@@ -81,7 +79,7 @@ VertexArray* VertexArray::GetPath(Vertex i_Start, Vertex i_End)
             i = m_Arr[i];
             toReturn->PushBack(i);
         }
-    }
+    //}
 
     return toReturn;
 }

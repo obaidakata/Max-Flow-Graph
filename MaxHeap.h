@@ -6,10 +6,11 @@ using namespace std;
 class MaxHeap
 {
 private:
-	pair<Vertex, Quantity>* data;
-	int maxSize;
-	int heapSize;
-	bool allocated;
+	pair<Vertex, Quantity>* m_Data;
+	int* m_Places;
+	int m_MaxSize;
+	int m_HeapSize;
+	bool m_Allocated;
 
 	int left(int nude);
 	int right(int node);
@@ -20,7 +21,6 @@ private:
 public:
 	MaxHeap(Quantity* A, int n);
 	~MaxHeap();
-
 	pair<Vertex, Quantity> Max();
 	pair<Vertex, Quantity>& DeleteMax();
 	void Insert(pair<Vertex, Quantity> i_Item);

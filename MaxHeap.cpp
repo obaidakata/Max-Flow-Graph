@@ -22,7 +22,7 @@ void MaxHeap::fixHeap(int node)
 	int leftNode = left(node);
 	int rightNode = right(node);
 
-	if ((leftNode < heapSize) && (data[leftNode].second > data[node].second))
+	if ((leftNode < m_HeapSize) && (m_Data[leftNode].second > m_Data[node].second))
 	{
 		max = leftNode;
 	}
@@ -31,31 +31,33 @@ void MaxHeap::fixHeap(int node)
 		max = node;
 	}
 
-	if ((rightNode < heapSize) && (data[rightNode].second > data[max].second))
+	if ((rightNode < m_HeapSize) && (m_Data[rightNode].second > m_Data[max].second))
 	{
 		max = rightNode;
 	}
 
 	if (max != node)
 	{
-		swapPair(data[node], data[max]);
+		swapPair(m_Data[node], m_Data[max]);
 		fixHeap(max);
 	}
 }
 
-MaxHeap::MaxHeap(Quantity* A, int i_N) :data(new pair<Vertex, Quantity>[i_N])
+MaxHeap::MaxHeap(Quantity* A, int i_N) :m_Data(new pair<Vertex, Quantity>[i_N])
 {
-	maxSize = heapSize = i_N;
-	allocated = true;
+	m_MaxSize = m_HeapSize = i_N;
+	m_Places = new int[i_N];
+	m_Allocated = true;
 
-	for (int i = 0; i < heapSize; i++)
+	for (int i = 0; i < m_HeapSize; i++)
 	{
-		data[i].first = i;
-		data[i].second = A[i];
+		m_Data[i].first = i;
+		m_Data[i].second = A[i];
+		m_Places[i] = i;
 	}
 		
 
-	for (int i = heapSize / 2 - 1; i >= 0; i--)
+	for (int i = m_HeapSize / 2 - 1; i >= 0; i--)
 	{
 		fixHeap(i);
 	}
@@ -68,55 +70,57 @@ MaxHeap::~MaxHeap()
 
 pair<Vertex, Quantity> MaxHeap::Max()
 {
-	if (heapSize < 0)
+	if (m_HeapSize < 0)
 	{
 		throw new exception("Heap Empty");
 	}
-	return data[0];
+	return m_Data[0];
 }
 
 pair<Vertex, Quantity>& MaxHeap::DeleteMax()
 {
-	if (heapSize < 1)
+	if (m_HeapSize < 1)
 	{
 		throw new exception("Heap Empty");
 	}
-	pair<Vertex, Quantity> max = data[0];
-	heapSize--;
-	copyPair(data[0], data[heapSize]);
+	pair<Vertex, Quantity> max = m_Data[0];
+	m_HeapSize--;
+	copyPair(m_Data[0], m_Data[m_HeapSize]);
+	m_Places[m_Data[m_HeapSize].first] = 0;
 	fixHeap(0);
 	return max;
 }
 
 void MaxHeap::Insert(pair<Vertex, Quantity> i_Item)
 {
-	if (heapSize == maxSize)
+	if (m_HeapSize == m_MaxSize)
 	{
 		throw new exception("Heap full");
 	}
 
-	int i = heapSize;
-	while ((i > 0) && (data[parent(i)].second > i_Item.second))
+	int i = m_HeapSize;
+	while ((i > 0) && (m_Data[parent(i)].second > i_Item.second))
 	{
-		copyPair(data[i], data[parent(i)]);
+		copyPair(m_Data[i], m_Data[parent(i)]);
 		i = parent(i);
-		heapSize++;
+		m_HeapSize++;
 	}
-	copyPair(data[i], i_Item);
+	copyPair(m_Data[i], i_Item);
 }
 
 void MaxHeap::MakeEmpty()
 {
-	if (allocated)
+	if (m_Allocated)
 	{
-		delete[] data;
+		delete[] m_Data;
+		delete[] m_Places;
 	}
-	allocated = !allocated;
+	m_Allocated = !m_Allocated;
 }
 
 bool MaxHeap::IsEmpty()
 {
-	return (heapSize < 1);
+	return (m_HeapSize < 1);
 }
 
 void MaxHeap::copyPair(pair<Vertex, Quantity>& i_One, pair<Vertex, Quantity>& i_Two)
@@ -127,6 +131,10 @@ void MaxHeap::copyPair(pair<Vertex, Quantity>& i_One, pair<Vertex, Quantity>& i_
 
 void MaxHeap::swapPair(pair<Vertex, Quantity>& i_One, pair<Vertex, Quantity>& i_Two)
 {
+	int tempIndex = m_Places[i_One.first];
+	m_Places[i_One.first] = m_Places[i_Two.first];
+	m_Places[i_Two.first] = tempIndex;
+
 	pair<Vertex, Quantity> temp;
 	copyPair(temp, i_One);
 	copyPair(i_One, i_Two);
@@ -135,27 +143,26 @@ void MaxHeap::swapPair(pair<Vertex, Quantity>& i_One, pair<Vertex, Quantity>& i_
 
 void MaxHeap::IncreaseKey(Vertex i_U, Quantity i_NewValue)
 {
-	int i = 0;
-	for (; i < heapSize; i++)
+	if(i_U < 0 || i_U > m_MaxSize)
 	{
-		if (data[i].first == i_U)
+		throw new exception("Vertex undefined");
+	}
+
+	int i = m_Places[i_U];
+	if (m_Data[i].second > i_NewValue)
+	{
+		throw new exception("Expect that new value largest the the old value");
+	}
+	else
+	{
+		
+		m_Data[i].second = i_NewValue;
+		while (i != 0 && m_Data[parent(i)].second < m_Data[i].second)
 		{
-			if (data[i].second > i_NewValue)
-			{
-				throw new exception("Expect that new value largest the the old value");
-			}
-			else
-			{
-				data[i].second = i_NewValue;
-			}
-			
-			break;
+			swapPair(m_Data[i], m_Data[parent(i)]);
+			i = parent(i);
 		}
 	}
 
-	while (i != 0 && data[parent(i)].second < data[i].second)
-	{
-		swapPair(data[i], data[parent(i)]);
-		i = parent(i);
-	}
+	
 }

@@ -17,7 +17,7 @@ public:
     Vertex& operator[](int i_Index);
     int Size();
     void PushBack(Vertex i_ToAdd);
-    VertexArray* GetPath(Vertex i_Start, Vertex i_End);
+    VertexArray* GetRangeFromPath(Vertex i_Start, Vertex i_End);
     bool IsAccessible(Vertex i_Start, Vertex i_End);
     friend ostream& operator<<(ostream& i_Out, const VertexArray& i_VertexArray);
 };

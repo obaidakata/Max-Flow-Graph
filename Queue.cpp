@@ -2,9 +2,9 @@
 
 Queue::Queue()
 {
-    Length = 0;
-    head = new Node();
-    tail = head;
+    m_Length = 0;
+    m_Head = new Node();
+    m_Tail = m_Head;
 }
 
 Queue::~Queue()
@@ -14,7 +14,7 @@ Queue::~Queue()
 
 void Queue::MakeEmpty()
 {
-    Node* current = head;
+    Node* current = m_Head;
     Node* next;
 
     while (current != nullptr)
@@ -27,7 +27,7 @@ void Queue::MakeEmpty()
 
 bool Queue::IsEmpty()
 {
-    return (Length == 0);
+    return (m_Length == 0);
 }
 
 Vertex Queue::First()
@@ -37,15 +37,15 @@ Vertex Queue::First()
         throw new exception("Error: Queue Empty");
     }
 
-    return head->GetNext()->GetData();
+    return m_Head->GetNext()->GetData();
 }
 
 void Queue::EnQueue(Vertex i_Data)
 {
     Node* newNode = new Node(i_Data);
-    tail->InsertAfter(newNode);
-    tail = newNode;
-    Length++;
+    m_Tail->InsertAfter(newNode);
+    m_Tail = newNode;
+    m_Length++;
 }
 
 Vertex Queue::DeQueue()
@@ -56,15 +56,20 @@ Vertex Queue::DeQueue()
     }
     else
     {
-        Node* temp = head->DeleteAfter();
+        Node* temp = m_Head->DeleteAfter();
         Vertex toBeReturned = temp->GetData();
-        if (tail == temp)
+        if (m_Tail == temp)
         {
-            tail = head;
+            m_Tail = m_Head;
         }
 
         delete temp;
-        Length--;
+        m_Length--;
         return toBeReturned;
     }
+}
+
+int Queue::Length()
+{
+    return m_Length;
 }
